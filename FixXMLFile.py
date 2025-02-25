@@ -5,23 +5,11 @@ import re
 def AdjustXML(filename):
 
     with open(filename, 'r') as currentFile:
-        lines = currentFile.readlines()
+        buffer = currentFile.readlines()
 
-    modifiedFile = open("modified_" + filename, "w")
-        
-    # Because python for loops are annoying. When we encounter one of the patterns,
-    # Have to keep track of the surrounding lines
-    deleteNextLine = False
-    deleteCurrentLine = False
-    modifyLine = False
-    previousLine = ""
-    widthValue = -1
-        
-    # Parse through the lines to find the ones to modify.
-    # There are three cases: beginadjustwidth, endadjustwidth, and vspace.
-    for i, line in enumerate(lines):
-
-        print("\nCurrent line: " + line)
+    # First, clean everything up
+    cleanedUpBuffer = []
+    for i, line in enumerate(buffer):
 
         #Delete single line xml comments
         line = re.sub(r'<!--.*?-->', '', line)
@@ -39,80 +27,124 @@ def AdjustXML(filename):
         # Lastly, skip empty lines (empty of only white spaces)
         if bool(re.match(r'^\s*$', line)):
             continue
-                
-        if deleteCurrentLine:
-            deleteCurrentLine = False
-            previousLine = line
-            continue
-        if deleteNextLine:
-            deleteNextLine = False
-            previousLine = line
-            continue
 
-        print("After skip lines. Current line: " + line)
-        
-        
-        # For adjust width, delete current line, previous one, and next one. Then modify
-        # the nextnext line to add a new xml class to the tag
-        # For vspace...
-        foundBeginAdjustWidthPattern = False
-        foundEndAdjustWidthPattern = False
-        foundVSpacePattern = False
-        
-        # Handle beginadjustwidth
-        if "beginadjustwidthbeginadjustwidthbeginadjustwidth" in line:
+        cleanedUpBuffer.append(line)
+
+    # With our clean buffer, fix the adjustwidths and vspaces
+    finalBuffer = cleanedUpBuffer
+    finished = False
+    while not finished:
+        for i, line in enumerate(cleanedUpBuffer):
+
+            #print(line)
+
+            # If we have beginadjustwidth, modify all para class until endadjustwidth
+            if "beginadjustwidthbeginadjustwidthbeginadjustwidth" in line:
+
+                # Delete the current line, previous line, and next line
+                del finalBuffer[i + 1]
+                del finalBuffer[i]
+                del finalBuffer[i - 1]
             
-            # Extract the width value
-            match = re.search(r'(\d+pt\d+pt)', line)
-            widthValue = match.group(0)
-            foundBeginAdjustWidthPattern = True
-            print("\nFound: " + str(widthValue))
+                # Extract the width value
+                match = re.search(r'(\d+pt\d+pt)', line)
+                widthValue = match.group(0)
+                foundBeginAdjustWidthPattern = True
 
-        elif "endadjustwidthendadjustwidthendadjustwidth" in line:
-            # No width value
-            foundEndAdjustWidthPattern = True
-            widthValue = -1
-            print("\nFound end adjust withd")
+                # Modify the final buffer until the endadjustwidth
+                index = i - 1
+                foundEndAdjustWidth = False
+                while not foundEndAdjustWidth:
 
-        # When we have beginadjustwidth, don't write the previous line, the current line, or the
-        # the next line. After skipping to the nextnextline, modify it to add an xml class
-        if foundBeginAdjustWidthPattern:
-            deleteNextLine = True
-            deleteCurrentLine = True
-            modifyLine = True
-            previousLine = line
-            continue
+                    # Make sure we haven't his end
+                    currentLine = finalBuffer[index]
+                    nextLine = finalBuffer[index + 1]
+                    if "endadjustwidthendadjustwidthendadjustwidth" in nextLine:
+                        foundEndAdjustWidth = True
+                        continue
+                    elif "<para" in currentLine:
 
-        # If we found the endadjustwidth, skip the lines and don't modify anything
-        if foundEndAdjustWidthPattern:
-            deleteNextLine = True
-            deleteCurrentLine = True
-            modifyLine = False
-            previousLine = line
-            continue
+                        # If it contains a class, add to it
+                        classString = ""
+                        match = re.search(r'class="([^"]*)"', currentLine)
+                        if "class" in currentLine:
+                            classString = match.group(1)
+                            lineWithClass = '<para class="ltx_adjustwidth' + str(widthValue)
+                            lineWithClass = lineWithClass +  " " + classString + '" '
+                            stringToReplace = '<para class="' + classString + '"'
+                            finalBuffer[index] = currentLine.replace(stringToReplace, lineWithClass)
+                        else:
+                            lineWithClass = '<para class="ltx_adjustwidth' + str(widthValue) + '" '
+                            stringToReplace = '<para '
+                            finalBuffer[index] = currentLine.replace(stringToReplace, lineWithClass)
+                    index = index + 1
+    
+                
+                # Reset from beginning, since we changed buffer, to keep things simple
+                break
 
-        # Modify the line we're writing. Make sure to modify the correct line
-        if modifyLine and '<para xml:id="Ch' in previousLine:
-            print("\nModifying the adjustwidth")
-            lineWithClass = '<para class="ltx_adjustwidth' + str(widthValue) + '" xml:id='
-            previousLine = previousLine.replace('<para xml:id=', lineWithClass)
-            modifyLine = False
+            elif "endadjustwidthendadjustwidthendadjustwidth" in line:
 
-            print("New line: " + previousLine)
-            print("line with class: " + lineWithClass)
-                    
-                    
-        # We have to stay one line behind
-        print("Writing line: " + previousLine)
-        modifiedFile.write(previousLine)
-        previousLine = line
+                # Delete the current line, previous line, and next line
+                del finalBuffer[i + 1]
+                del finalBuffer[i]
+                del finalBuffer[i - 1]
 
-    # Don't forget the last line!
-    modifiedFile.write(previousLine)
+                # Reset
+                break;
 
-if len(sys.argv) != 2:
-    print("Incorrect usage. Use: FixXMLFile.py pathToXML.xml")
+            elif "vspacevspacevspace" in line:
+
+                # Delete the current line, previous line, and next line
+                del finalBuffer[i + 1]
+                del finalBuffer[i]
+                del finalBuffer[i - 1]
+
+                # Modify the next <para after vspace to have an additional vspace class
+                # Modify the final buffer until the endadjustwidth
+                index = i - 1
+                foundNextPara = False
+                while not foundNextPara:
+
+                    # Make sure we haven't his end
+                    currentLine = finalBuffer[index]
+                    if "<para" in currentLine:
+
+                        # If it contains a class, add to it
+                        foundNextPara = True
+                        classString = ""
+                        print("Is class in string: " + currentLine)
+                        match = re.search(r'class="([^"]*)"', currentLine)
+                        if "class" in currentLine:
+                            classString = match.group(1)
+                            lineWithClass = '<para class="ltx_vspace' + str(vspaceValue)
+                            lineWithClass = lineWithClass +  " " + classString + '" '
+                            stringToReplace = '<para class="' + classString + '"'
+                            print("\n\n\nReplacing: " + classString)
+                            print(stringToReplace)
+                            finalBuffer[index] = currentLine.replace(stringToReplace, lineWithClass)
+                        else:
+                            lineWithClass = '<para class="ltx_vspace' + str(vspaceValue) + '" '
+                            stringToReplace = '<para '
+                            finalBuffer[index] = currentLine.replace(stringToReplace, lineWithClass)
+                    index = index + 1
+                
+                # Reset
+                break;
+                
+            if i == len(finalBuffer) - 1:
+                finished = True
+    
+    modifiedFile = open("modified_" + filename, "w")
+    modifiedFile.writelines(finalBuffer)
+
+if len(sys.argv) != 3:
+    print("Incorrect usage. Use: FixXMLFile.py pathToXML.xml vspacevalue")
     sys.exit(1)
 
 filename = sys.argv[1]
+vspaceValue = sys.argv[2]
+
+print(str(vspaceValue))
+
 AdjustXML(filename)

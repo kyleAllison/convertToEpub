@@ -2,9 +2,13 @@
 
 # Use: ./MakeEpupBook.sh path/to/main.tex
 
+# TODO if I wanted:
 # To avoid making the scripts overly complicated, the tex files needs the following:
 # Blank lines around the special latex commands adjustwidth and vspace
 # The chapters are included by: \input path/chapterName/tex
+# I wasn't careful about vspace, so I don't parse the value and instead set it here for everywhere
+# Can't have vspace immediately before adjustwidth
+vspaceValue="10mm"
 
 # Strip file path and extension
 filenameWithPath=$1
@@ -39,7 +43,7 @@ fi
 latexml --dest=$fileBaseName.xml ./$tempDir/$filename
 
 # Fix the xml issues from the latex comands
-python3 ./FixXMLFile.py $fileBaseName.xml
+python3 ./FixXMLFile.py $fileBaseName.xml $vspaceValue
 
 # Convert to html
 latexmlpost -dest=$fileBaseName.html $modified_fileBaseName.xml
