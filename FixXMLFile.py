@@ -33,8 +33,8 @@ def AdjustXML(filename):
         line = re.sub(r'<!--.*', '', line)
         # Delete the end line of multi-line comments
         line = re.sub(r'%.*?-->', '', line)
-        # Delete the middle lines
-        line = re.sub(r'%.*', '', line)
+        # Delete the middle lines. Can start with any number of white spaces
+        line = re.sub(r"^\s*%.*\n?", '', line)
 
         # Lastly, skip empty lines (empty of only white spaces)
         if bool(re.match(r'^\s*$', line)):

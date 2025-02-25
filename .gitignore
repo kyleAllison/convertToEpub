@@ -26,3 +26,5 @@ DB/
 \tempDir
 *.xml
 *.log
+*.css
+*.html
