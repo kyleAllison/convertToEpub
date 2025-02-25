@@ -1,0 +1,26 @@
+# Ignore all
+*
+
+# Unignore all with extensions
+!*.*
+
+# Unignore all dirs
+!*/
+
+
+# Ignore Temp emacs files
+\#*\#
+.\#*
+
+# Ignore other large/unnecessary files
+*.raw
+*.root
+DB/
+*~
+*.corr
+**/*.corr
+*hadd*
+*.o
+
+#
+\tempDir
