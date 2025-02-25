@@ -36,8 +36,6 @@ def AdjustXML(filename):
     while not finished:
         for i, line in enumerate(cleanedUpBuffer):
 
-            #print(line)
-
             # If we have beginadjustwidth, modify all para class until endadjustwidth
             if "beginadjustwidthbeginadjustwidthbeginadjustwidth" in line:
 
@@ -46,7 +44,8 @@ def AdjustXML(filename):
                 del finalBuffer[i]
                 del finalBuffer[i - 1]
             
-                # Extract the width value
+                # Extract the width value.
+                # Wasn't working in css for some reason, so they are all 50pt50pt for now
                 match = re.search(r'(\d+pt\d+pt)', line)
                 widthValue = match.group(0)
                 foundBeginAdjustWidthPattern = True
@@ -70,6 +69,7 @@ def AdjustXML(filename):
                         if "class" in currentLine:
                             classString = match.group(1)
                             lineWithClass = '<para class="ltx_adjustwidth' + str(widthValue)
+                            #lineWithClass = '<para class="ltx_adjustwidth50pt50pt'
                             lineWithClass = lineWithClass +  " " + classString + '" '
                             stringToReplace = '<para class="' + classString + '"'
                             finalBuffer[index] = currentLine.replace(stringToReplace, lineWithClass)
@@ -113,15 +113,12 @@ def AdjustXML(filename):
                         # If it contains a class, add to it
                         foundNextPara = True
                         classString = ""
-                        print("Is class in string: " + currentLine)
                         match = re.search(r'class="([^"]*)"', currentLine)
                         if "class" in currentLine:
                             classString = match.group(1)
                             lineWithClass = '<para class="ltx_vspace' + str(vspaceValue)
                             lineWithClass = lineWithClass +  " " + classString + '" '
                             stringToReplace = '<para class="' + classString + '"'
-                            print("\n\n\nReplacing: " + classString)
-                            print(stringToReplace)
                             finalBuffer[index] = currentLine.replace(stringToReplace, lineWithClass)
                         else:
                             lineWithClass = '<para class="ltx_vspace' + str(vspaceValue) + '" '
@@ -144,7 +141,5 @@ if len(sys.argv) != 3:
 
 filename = sys.argv[1]
 vspaceValue = sys.argv[2]
-
-print(str(vspaceValue))
 
 AdjustXML(filename)

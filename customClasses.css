@@ -1,0 +1,28 @@
+/* This works! */
+.ltx_adjustwidth50pt50pt {
+    margin-left: 5% !important; 
+    margin-right: 5% !important; 
+    width: 90% !important;
+    text-align: justify !important;
+    text-indent: 0 !important;
+}
+
+.ltx_adjustwidth60pt60pt {
+    margin-left: 8% !important; 
+    margin-right: 8% !important; 
+    width: 84% !important;
+    text-align: justify !important;
+    text-indent: 0 !important;
+}
+
+.ltx_vspace10mm {
+    margin-top: 10mm
+}
+
+.ltx_noindent {
+    text-indent: 0 !important;
+}
+
+
+/* Add a rule to justify all text
+
