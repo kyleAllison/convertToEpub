@@ -17,8 +17,19 @@ rm -rf ./$tempDir
 mkdir $tempDir
 cp -r $filepath/* ./$tempDir
 
-# Changes \vspace{10pt} to "vspacevspacevspace"
-python3 ./ModifyLatexFilesForVSpace.py ./$tempDir/$filename
+# Modify the tex files to remove the latex commands that don't work with latexml
+# These are: \vspace, \begin{adjustwidth}
+# All it does is changes \vspace{10pt} to "vspacevspacevspace10pt"
+python3 ./ModifyLatexFilesForConversion.py ./$tempDir/$filename adjustwidth
+exitStatus=$?
+if [ "$exitStatus" -ne 0 ]; then
+    exit 1
+fi
+python3 ./ModifyLatexFilesForConversion.py ./$tempDir/$filename vspace
+exitStatus=$?
+if [ "$exitStatus" -ne 0 ]; then
+    exit 1
+fi
 
 # Convert to xml
 latexml --dest=$fileBaseName.xml ./$tempDir/$filename

@@ -22,5 +22,7 @@ DB/
 *hadd*
 *.o
 
-#
+
 \tempDir
+*.xml
+*.log
