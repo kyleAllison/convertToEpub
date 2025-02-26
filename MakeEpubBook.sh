@@ -4,6 +4,9 @@
 # Then load the book.html in Calibre gui, then convert to epub.
 # Using command line ebook-convert seems to ignore extra-css no matter what I try, which
 # is why this last step has to be manual
+# Script "ExtraStyling.sh" will then modify the pass epub book, centering the titles,
+# removing spaces between lines, and lowering the margins (?). Still indents lines I don't
+# want it to
 
 # TODO if I wanted:
 # To avoid making the scripts overly complicated, the tex files needs the following:
@@ -11,6 +14,7 @@
 # The chapters are included by: \input path/chapterName/tex
 # I wasn't careful about vspace, so I don't parse the value and instead set it here for everywhere
 # All of my desires to not indent after breaks and after epigraphs seem to be overridden
+# Would be nice to not need the post script
 vspaceValue="10mm"
 
 # # Strip file path and extension

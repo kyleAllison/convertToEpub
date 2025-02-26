@@ -1,16 +1,16 @@
 /* This works! */
 .ltx_adjustwidth50pt50pt {
-    margin-left: 5% !important; 
-    margin-right: 5% !important; 
-    width: 90% !important;
+    margin-left: 10% !important; 
+    margin-right: 10% !important; 
+    width: 80% !important;
     text-align: justify !important;
     text-indent: 0 !important;
 }
 
 .ltx_adjustwidth60pt60pt {
-    margin-left: 8% !important; 
-    margin-right: 8% !important; 
-    width: 84% !important;
+    margin-left: 12% !important; 
+    margin-right: 12% !important; 
+    width: 76% !important;
     text-align: justify !important;
     text-indent: 0 !important;
 }
@@ -23,6 +23,10 @@
     text-indent: 0 !important;
 }
 
+.ltx_title1 {
+    justify-content: center !important;
+    text-align: center !important;
+}
 
 /* Add a rule to justify all text
 
