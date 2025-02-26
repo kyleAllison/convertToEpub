@@ -16,7 +16,13 @@ pythonScript="PostModifyEpub.py"
 bookDir="unzippedBook"
 rm -rf $bookDir
 mkdir $bookDir
-unzip ${filenameWithPath} -d ./$bookDir
+
+# Get rid of any spaces in the name
+newBookName="bookToModify.epub"
+cp  "$filenameWithPath" ./
+mv "$filename" ./$newBookName
+
+unzip $newBookName -d ./$bookDir
 cp $pythonScript $bookDir
 cd $bookDir
 
@@ -29,3 +35,7 @@ zip -X0 $bookName mimetype
 zip -r9 $bookName META-INF OEBPS *.jpg *.xhtml *.ncx *.opf *.css *.html
 mv $bookName ../
 cd ../
+
+# Clean-up
+rm ./$newBookName
+rm -rf $bookDir

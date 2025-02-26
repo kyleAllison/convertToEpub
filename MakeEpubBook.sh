@@ -2,19 +2,17 @@
 
 # Use: ./MakeEpupBook.sh path/to/main.tex
 # Then load the book.html in Calibre gui, then convert to epub.
-# Using command line ebook-convert seems to ignore extra-css no matter what I try, which
-# is why this last step has to be manual
-# Script "ExtraStyling.sh" will then modify the pass epub book, centering the titles,
-# removing spaces between lines, and lowering the margins (?). Still indents lines I don't
-# want it to
+# Script "ExtraStyling.sh" will then modify the passed epub book, centering the titles,
+# removing spaces between lines, and lowering the margins (?).
 
 # TODO if I wanted:
 # To avoid making the scripts overly complicated, the tex files needs the following:
 # Blank lines around the special latex commands adjustwidth and vspace
-# The chapters are included by: \input path/chapterName/tex
+# The chapters have to be included by: \input path/chapterName/tex
 # I wasn't careful about vspace, so I don't parse the value and instead set it here for everywhere
 # All of my desires to not indent after breaks and after epigraphs seem to be overridden
-# Would be nice to not need the post script
+# Would be nice to not need the post script or the manual loading into calibre,
+# but everything only seems to work if it's manual
 vspaceValue="10mm"
 
 # # Strip file path and extension
@@ -58,5 +56,4 @@ sed -i '/<link rel="stylesheet" href="LaTeXML.css" type="text\/css">/a <link rel
 # Make the epub.
 #ebook-convert $fileBaseName.html $fileBaseName.epub --language en --no-default-epub-cover --extra-css customClasses.css
 
-# Add in the special adjust width and vspace rules
 
